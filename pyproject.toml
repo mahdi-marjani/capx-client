@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "capx-client"
+version = "0.1.0"
+description = "capx client for solving reCAPTCHA challenges."
+authors = [{name = "Mahdi Marjani", email = "mahdi.marjani.dev@gmail.com"}]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy==2.2.6",
+    "Pillow==12.0.0",
+    "Requests==2.32.5",
+    "selenium==4.39.0",
+    "webdriver_manager==4.0.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/mahdi-marjani/capx-client"
+Documentation = "https://github.com/mahdi-marjani/capx-client"
+Repository = "https://github.com/mahdi-marjani/capx-client.git"
+Issues = "https://github.com/mahdi-marjani/capx-client/issues"
