@@ -1,6 +1,6 @@
 # capx-client
 
-A simple client for solving reCAPTCHA challenges using Selenium and an image detection API.
+capx client for solving reCAPTCHA using Selenium and capx server. 
 
 ## Installation
 
