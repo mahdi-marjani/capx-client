@@ -10,12 +10,20 @@ from .utils import (
     paste_image_on_main,
 )
 
-from .api import is_model_available, detect
 
-
-class RecaptchaSolver:
+class BaseRecaptchaSolver:
     def __init__(self, driver):
         self.driver = driver
+
+    # =========================
+    # Abstract methods (override in subclasses)
+    # =========================
+    
+    def is_model_available(self, target_text):
+        raise NotImplementedError
+
+    def detect(self, image_array, grid, target_text):
+        raise NotImplementedError
 
     # =========================
     # Public API
@@ -98,7 +106,7 @@ class RecaptchaSolver:
 
         target_text = title_wrapper.find_element(By.XPATH, ".//strong").text
 
-        if not is_model_available(target_text):
+        if not self.is_model_available(target_text):
             return None, None, None, None
 
         if "squares" in title_wrapper.text:
@@ -117,7 +125,7 @@ class RecaptchaSolver:
         img_urls = get_all_image_urls(self.driver)
         main_image_array = get_image_array(img_urls[0])
 
-        answers = detect(main_image_array, "4x4", target_text)
+        answers = self.detect(main_image_array, "4x4", target_text)
         if 1 <= len(answers) < 16:
             return "squares", target_text, answers, main_image_array
 
@@ -129,7 +137,7 @@ class RecaptchaSolver:
             return None, None, None
 
         main_image_array = get_image_array(img_urls[0])
-        answers = detect(main_image_array, "3x3", target_text)
+        answers = self.detect(main_image_array, "3x3", target_text)
 
         if len(answers) > 2:
             return "dynamic", target_text, answers, main_image_array
@@ -140,7 +148,7 @@ class RecaptchaSolver:
         img_urls = get_all_image_urls(self.driver)
         main_image_array = get_image_array(img_urls[0])
 
-        answers = detect(main_image_array, "3x3", target_text)
+        answers = self.detect(main_image_array, "3x3", target_text)
         if len(answers) > 2:
             return "selection", target_text, answers, main_image_array
 
@@ -162,7 +170,7 @@ class RecaptchaSolver:
             new_images_array = self._download_dynamic_images(answers, new_urls)
             main_image_array = self._merge_dynamic_images(answers, main_image_array, new_images_array)
 
-            answers = detect(main_image_array, "3x3", target_text)
+            answers = self.detect(main_image_array, "3x3", target_text)
             if not answers:
                 break
 
@@ -274,3 +282,11 @@ class RecaptchaSolver:
 
     def _finalize(self):
         self.driver.switch_to.default_content()
+
+
+class RecaptchaSolver(BaseRecaptchaSolver):
+    def __init__(self, driver):
+        super().__init__(driver)
+        from .api import is_model_available, detect
+        self.is_model_available = is_model_available
+        self.detect = detect
