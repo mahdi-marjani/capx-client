@@ -26,6 +26,7 @@ driver.get("https://www.google.com/recaptcha/api2/demo")
 solver = RecaptchaSolver(driver)
 solver.solve()  # Done!
 
+print("reCAPTCHA solved!")
 input("Press Enter to quit...")
 driver.quit()
 ```
