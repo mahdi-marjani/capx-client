@@ -3,52 +3,30 @@ import base64
 import requests
 from PIL import Image
 
-SERVER_URL = "http://localhost:8000/detect"
+SERVER_URL = "http://localhost:8000"
 
-AVAILABLE_MODELS = [
-    "bicycle",
-    "bus",
-    "tractor",
-    "boat",
-    "car",
-    "hydrant",
-    "motorcycle",
-    "traffic",
-    "crosswalk",
-    "stair",
-    "taxi",
-]
 
-def is_model_available(target_text):
-    for model in AVAILABLE_MODELS:
-        if model in target_text:
-            return True
-    return False
+def get_models():
+    res = requests.get(f"{SERVER_URL}/models")
+    res.raise_for_status()
+    return res.json()["models"]
 
-def detect(image_array, grid, target_text):
-    """
-    Detect cells in the image based on the grid and target text.
-    
-    :param image_array: Numpy array of the image.
-    :param grid: Grid size, either "3x3" or "4x4".
-    :param target_text: Text to detect or target in the image.
-    :return: List of detected cells from the server response.
-    """
+
+def detect_cells(image_array, grid, target_text):
     image = Image.fromarray(image_array)
-    
-    buffered = io.BytesIO()
-    image.save(buffered, format="PNG")
-    
-    image_b64 = base64.b64encode(buffered.getvalue()).decode()
-    
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+
+    image_b64 = base64.b64encode(buffer.getvalue()).decode()
+
     res = requests.post(
-        SERVER_URL,
+        f"{SERVER_URL}/detect",
         json={
             "image": image_b64,
-            "grid": grid,
-            "target": target_text
+            "grid": grid,           # "3x3" or "4x4"
+            "target": target_text,
         },
-        timeout=30
+        timeout=60,
     )
     res.raise_for_status()
     return res.json()["cells"]

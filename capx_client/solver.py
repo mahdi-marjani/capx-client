@@ -10,6 +10,8 @@ from .utils import (
     paste_image_on_main,
 )
 
+from .api import get_models, detect_cells
+
 
 class BaseRecaptchaSolver:
     def __init__(self, driver):
@@ -20,10 +22,10 @@ class BaseRecaptchaSolver:
     # =========================
     
     def is_model_available(self, target_text):
-        raise NotImplementedError
+        pass
 
     def detect(self, image_array, grid, target_text):
-        raise NotImplementedError
+        pass
 
     # =========================
     # Public API
@@ -287,6 +289,11 @@ class BaseRecaptchaSolver:
 class RecaptchaSolver(BaseRecaptchaSolver):
     def __init__(self, driver):
         super().__init__(driver)
-        from .api import is_model_available, detect
-        self.is_model_available = is_model_available
-        self.detect = detect
+        self.available_models = get_models()
+
+    def is_model_available(self, target_text):
+        target_text = target_text.lower()
+        return any(model in target_text for model in self.available_models)
+
+    def detect(self, image_array, grid, target_text):
+        return detect_cells(image_array, grid, target_text)
