@@ -1,13 +1,13 @@
-# capx-client
+# rcap-client
 
-capx client for solving reCAPTCHA using Selenium and capx server. 
+rcap client for solving reCAPTCHA using Selenium and rcap server. 
 
 ## Installation
 
 Install via pip:
 
 ```
-pip install capx-client
+pip install rcap-client
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ Here's an example of how to use it:
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
-from capx_client.solver import RecaptchaSolver
+from rcap_client.solver import RecaptchaSolver
 
 driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
 driver.get("https://www.google.com/recaptcha/api2/demo")
