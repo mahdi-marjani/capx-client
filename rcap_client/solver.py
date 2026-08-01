@@ -140,7 +140,7 @@ class BaseRecaptchaSolver:
     def _handle_dynamic_3x3(self, target_text):
         img_urls = get_all_image_urls(self.driver)
         if len(set(img_urls)) != 1:
-            return None, None, None
+            return None, None, None, None
 
         main_image_array = get_image_array(img_urls[0])
         answers = self.detect(main_image_array, "3x3", target_text)
