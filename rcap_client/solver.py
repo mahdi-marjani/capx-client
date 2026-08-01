@@ -12,6 +12,10 @@ from .utils import (
 
 from .api import get_models, detect_cells
 
+import logging
+
+logging.basicConfig(level=logging.ERROR)
+
 
 class BaseRecaptchaSolver:
     def __init__(self, driver):
@@ -63,7 +67,7 @@ class BaseRecaptchaSolver:
                     break
 
             except Exception as e:
-                print(e)
+                logging.exception("An error occurred")
                 self._recover_from_error()
 
     # =========================
