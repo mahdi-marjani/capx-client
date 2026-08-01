@@ -9,13 +9,13 @@ description = "rcap client for solving reCAPTCHA challenges."
 authors = [{name = "Mahdi Marjani", email = "mahdi.marjani.dev@gmail.com"}]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
-    "numpy>=2.2.6",
-    "Pillow>=12.1.0",
-    "Requests>=2.32.5",
-    "selenium>=4.39.0",
-    "webdriver_manager>=4.0.2",
+    "numpy>=2.2.6,<3",
+    "pillow>=10,<13",
+    "requests>=2.32.5,<3",
+    "selenium>=4.20,<5",
+    "webdriver-manager>=4.0.2,<5",
 ]
 
 [tool.setuptools]
