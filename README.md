@@ -1,6 +1,6 @@
 # rcap-client
 
-rcap client for solving reCAPTCHA using Selenium and rcap server. 
+[rcap](https://github.com/mahdi-marjani/rcap) browser interactions for solving reCAPTCHA using Selenium and rcap server. 
 
 ## Installation
 
