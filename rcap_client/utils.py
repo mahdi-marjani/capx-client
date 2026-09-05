@@ -7,13 +7,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def switch_to_recaptcha_frame(driver, frame_xpath):
-    """Switch to the reCAPTCHA frame."""
+def selenium_switch_to_iframe(driver, iframe_xpath):
+    """Switch to a iframe."""
     driver.switch_to.default_content()
-    frame = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, frame_xpath))
+    iframe = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, iframe_xpath))
     )
-    driver.switch_to.frame(frame)
+    driver.switch_to.frame(iframe)
 
 
 def get_image_array(url):
@@ -63,7 +63,7 @@ def paste_image_on_main(main_img, new_img, position):
     return main
 
 
-def get_all_image_urls(driver):
+def selenium_get_captcha_image_urls(driver):
     """Get all image URLs from the CAPTCHA grid."""
     images = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located(
@@ -73,7 +73,7 @@ def get_all_image_urls(driver):
     return [img.get_attribute("src") for img in images]
 
 
-def get_new_dynamic_image_urls(answers, old_urls, driver):
+def selenium_get_new_dynamic_image_urls(answers, old_urls, driver):
     """Check for new dynamic CAPTCHA images and return if changed."""
     images = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located(
