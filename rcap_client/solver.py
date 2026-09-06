@@ -1,4 +1,4 @@
-import utils
+from . import utils
 
 import logging
 
@@ -82,15 +82,17 @@ class RecaptchaSolver:
 
     def _is_checkbox_checked(self):
         self.browser.switch_to_frame('//iframe[@title="reCAPTCHA"]')
-        return self.browser.get_attribute('//span[@id="recaptcha-anchor"]', "aria-checked", 10) == "true"
+        recaptcha_anchor = self.browser.find_element('//span[@id="recaptcha-anchor"]', 10, 'present')
+        return self.browser.get_attribute(recaptcha_anchor, 'aria-checked') == 'true'
 
 
     def _analyze_challenge(self):
         self._switch_to_challenge_frame()
 
-        title_wrapper = self.browser.find('//*[@id="rc-imageselect"]', 10, 'present')
+        title_wrapper = self.browser.find_element('//*[@id="rc-imageselect"]', 10, 'present')
 
-        target_text = self.browser.find_text_inside_element(title_wrapper)
+        target = self.browser.find_element_inside_element(title_wrapper, './/strong')
+        target_text = self.browser.get_element_text(target)
 
         if not self.detector.is_model_available(target_text):
             return None, None, None, None
@@ -107,7 +109,7 @@ class RecaptchaSolver:
 
 
     def _handle_4x4(self, target_text):
-        img_urls = self.browser.get_captcha_image_urls()
+        img_urls = self._get_captcha_image_urls()
         main_image_array = utils.get_image_array(img_urls[0])
 
         answers = self.detector.detect(main_image_array, "4x4", target_text)
@@ -117,8 +119,14 @@ class RecaptchaSolver:
         return None, None, None, None
 
 
+    def _get_captcha_image_urls(self):
+        images = self.browser.find_elements('//div[@id="rc-imageselect-target"]//img', 10, 'present')
+        
+        return [self.browser.get_attribute(img, 'src') for img in images]
+
+
     def _handle_dynamic_3x3(self, target_text):
-        img_urls = self.browser.get_captcha_image_urls()
+        img_urls = self._get_captcha_image_urls()
         if len(set(img_urls)) != 1:
             return None, None, None, None
 
@@ -132,7 +140,7 @@ class RecaptchaSolver:
 
 
     def _handle_static_3x3(self, target_text):
-        img_urls = self.browser.get_captcha_image_urls()
+        img_urls = self._get_captcha_image_urls()
         main_image_array = utils.get_image_array(img_urls[0])
 
         answers = self.detector.detect(main_image_array, "3x3", target_text)
@@ -151,7 +159,7 @@ class RecaptchaSolver:
         self._click_answers(answers)
 
         while True:
-            old_urls = self.browser.get_captcha_image_urls()
+            old_urls = self._get_captcha_image_urls()
             is_new, new_urls = self._wait_for_new_dynamic_images(
                 answers, old_urls
             )
@@ -173,11 +181,35 @@ class RecaptchaSolver:
 
     def _wait_for_new_dynamic_images(self, answers, old_urls):
         while True:
-            is_new, new_urls = self.browser.get_new_dynamic_image_urls(
+            is_new, new_urls = self._get_new_dynamic_image_urls(
                 answers, old_urls
             )
             if is_new:
                 return is_new, new_urls
+
+
+    def _get_new_dynamic_image_urls(self, answers, old_urls):
+        images = self.browser.find_elements('//div[@id="rc-imageselect-target"]//img', 10, 'present')
+        new_urls = []
+
+        for img in images:
+            try:
+                new_urls.append(self.browser.get_attribute(img, 'src'))
+            except:
+                is_new = False
+                return is_new, new_urls
+
+        same_count = 0
+        for answer in answers:
+            if new_urls[answer - 1] == old_urls[answer - 1]:
+                same_count += 1
+
+        if same_count > 0:
+            is_new = False
+            return is_new, new_urls
+        else:
+            is_new = True
+            return is_new, new_urls
 
 
     def _download_dynamic_images(self, answers, img_urls):

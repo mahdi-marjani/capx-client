@@ -8,19 +8,22 @@ from .browser import Browser
 from .solver import RecaptchaSolver
 from .detector import Detector
 
-import utils
-
 
 class SeleniumBrowser(Browser):
 
     def __init__(self, driver: WebDriver):
         self.driver = driver
 
+
     def switch_to_frame(self, selector: str):
-        utils.selenium_switch_to_iframe(self.driver, selector)
+        self.switch_to_main_frame()
+        iframe = self.find_element(selector, 10, 'present')
+        self.driver.switch_to.frame(iframe)
+
 
     def switch_to_main_frame(self):
         self.driver.switch_to.default_content()
+
 
     def click(self, selector: str, timeout: float):
         WebDriverWait(self.driver, timeout).until(
@@ -28,6 +31,7 @@ class SeleniumBrowser(Browser):
                 (By.XPATH, selector)
             )
         ).click()
+
 
     def wait_for(self, selector: str, timeout: float, status: str):
         _CONDITIONS = {
@@ -42,14 +46,12 @@ class SeleniumBrowser(Browser):
             condition((By.XPATH, selector))
         )
 
-    def get_attribute(self, selector: str, name: str, timeout: float):
-        return WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, selector)
-                )
-            ).get_attribute(name)
 
-    def find(self, selector: str, timeout: float, status: str):
+    def get_attribute(self, element: WebElement, name: str):
+        return element.get_attribute(name)
+
+
+    def find_element(self, selector: str, timeout: float, status: str):
         _CONDITIONS = {
             # 'clickable': EC.element_to_be_clickable,
             # 'visible': EC.visibility_of_element_located,
@@ -62,17 +64,25 @@ class SeleniumBrowser(Browser):
             condition((By.XPATH, selector))
         )
 
-    def find_text_inside_element(self, element: WebElement):
-        return element.find_element(By.XPATH, ".//strong").text
+
+    def find_elements(self, selector: str, timeout: float, status: str):
+        _CONDITIONS = {
+            'present': EC.presence_of_all_elements_located
+        }
+
+        condition = _CONDITIONS[status]
+
+        return WebDriverWait(self.driver, timeout).until(
+            condition((By.XPATH, selector))
+        )
+
+
+    def find_element_inside_element(self, element: WebElement, selector: str):
+        return element.find_element(By.XPATH, selector)
+
 
     def get_element_text(self, element: WebElement):
         return element.text
-
-    def get_captcha_image_urls(self):
-        return utils.selenium_get_captcha_image_urls(self.driver)
-
-    def get_new_dynamic_image_urls(self, answers: list, old_urls: list):
-        return utils.selenium_get_new_dynamic_image_urls(answers, old_urls, self.driver)
 
 
 class SeleniumRecaptchaSolver(RecaptchaSolver):
