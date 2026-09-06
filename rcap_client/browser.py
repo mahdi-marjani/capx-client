@@ -4,11 +4,15 @@ from abc import ABC, abstractmethod
 class Browser(ABC):
 
     @abstractmethod
-    def find(self, selector: str, timeout: float, status: str):
+    def find_element(self, selector: str, timeout: float, status: str):
         ...
 
     @abstractmethod
-    def find_text_inside_element(self, element):
+    def find_elements(self, selector: str, timeout: float, status: str):
+        ...
+
+    @abstractmethod
+    def find_element_inside_element(self, element, selector: str):
         ...
 
     @abstractmethod
@@ -20,7 +24,7 @@ class Browser(ABC):
         ...
 
     @abstractmethod
-    def get_attribute(self, selector: str, name: str, timeout: float):
+    def get_attribute(self, element, name: str):
         ...
 
     @abstractmethod
@@ -33,12 +37,4 @@ class Browser(ABC):
 
     @abstractmethod
     def wait_for(self, selector: str, timeout: float, status: str):
-        ...
-
-    @abstractmethod
-    def get_captcha_image_urls(self):
-        ...
-
-    @abstractmethod
-    def get_new_dynamic_image_urls(self, answers: list, old_urls: list):
         ...
