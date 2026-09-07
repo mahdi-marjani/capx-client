@@ -18,12 +18,12 @@ Here's an example of how to use it:
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
-from rcap_client.solver import RecaptchaSolver
+from rcap_client.selenium import SeleniumRecaptchaSolver
 
 driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
 driver.get("https://www.google.com/recaptcha/api2/demo")
 
-solver = RecaptchaSolver(driver)
+solver = SeleniumRecaptchaSolver(driver)
 solver.solve()  # Done!
 
 print("reCAPTCHA solved!")
